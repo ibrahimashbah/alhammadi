@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Al Hammadi">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#d1b66c"/><stop offset=".5" stop-color="#f0d78e"/><stop offset="1" stop-color="#a98443"/></linearGradient></defs>
+<rect width="512" height="512" fill="#050203"/>
+<path fill="url(#g)" fill-rule="evenodd" d="M112 112h288v288h-46V158H158v242h-46V112Zm92 92h196v196h-46V250H250v150h-46V204Zm92 92h104v104h-46v-58h-12v58h-46V296Zm0-92h104v104H296V204Zm46 46v12h12v-12h-12Z"/>
+</svg>
