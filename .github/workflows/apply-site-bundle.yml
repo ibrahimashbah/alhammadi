@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.deploy/sitebundle.tgz'
+      - '.deploy/sitebundle.ready'
       - '.github/workflows/apply-site-bundle.yml'
   workflow_dispatch:
 
@@ -30,7 +31,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tar -xzf .deploy/sitebundle.tgz -C .
+          if [ -f .deploy/sitebundle.tgz ]; then
+            BUNDLE=.deploy/sitebundle.tgz
+          else
+            cat .deploy/sitebundle.part*.b64 | base64 -d > /tmp/sitebundle.tgz
+            BUNDLE=/tmp/sitebundle.tgz
+          fi
+          tar -xzf "$BUNDLE" -C .
 
       - name: Import imagery from current Al Hammadi website
         shell: bash
