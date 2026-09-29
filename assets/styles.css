@@ -539,3 +539,31 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .floating-actions { bottom:max(24px, env(safe-area-inset-bottom)); }
   @media (max-width:680px) { .floating-actions { bottom:max(14px, env(safe-area-inset-bottom)); } }
 }
+
+/* v3 responsive and content-media audit */
+img { height:auto; }
+.practice-icon, .practice-detail-head img { width:42px; height:42px; object-fit:contain; filter:grayscale(1) sepia(.15); opacity:.82; }
+.practice-top { display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:44px; }
+.practice-card:hover .practice-icon { filter:none; opacity:1; }
+.visual-panel { position:relative; min-height:560px; overflow:hidden; background:var(--night); }
+.visual-panel > img { width:100%; height:100%; position:absolute; inset:0; object-fit:cover; object-position:center; }
+.visual-panel::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 45%, rgba(8,10,11,.45)); pointer-events:none; }
+.visual-fallback { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:var(--night); }
+.visual-fallback img { width:min(42%,220px); filter:drop-shadow(0 12px 32px rgba(0,0,0,.22)); }
+.visual-panel.image-missing > img { display:none; }
+.visual-panel.image-missing .visual-fallback { display:flex; }
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+@media (max-width:680px){
+  .site-header .brand{display:flex;flex:0 0 auto}
+  .site-header .brand img{width:40px;height:40px}
+  .header-inner{gap:12px}
+  .header-actions{margin-inline-start:auto}
+  .visual-panel{min-height:340px}
+  .practice-top{min-height:40px}
+  .practice-icon,.practice-detail-head img{width:36px;height:36px}
+}
+@media (max-width:390px){ .hero-side{padding-bottom:6px} }
