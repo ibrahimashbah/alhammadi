@@ -130,8 +130,8 @@ html[dir="ltr"] .link-arrow:hover .arrow { transform: translateX(5px); }
 }
 .header-inner { min-height: 94px; display: flex; align-items: center; justify-content: space-between; gap: 26px; }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 220px; }
-.brand img { width: 48px; height: 48px; }
-.brand-copy { line-height: 1.25; }
+.brand img { width: 48px; height: 48px; transform: scale(1.9); transform-origin: center; }
+.brand-copy { line-height: 1.25; margin-inline-start: 14px; }
 .brand-copy strong { display: block; font-size: 13px; font-weight: 600; }
 .brand-copy span { display: block; font-size: 10px; opacity: .72; margin-top: 4px; }
 .nav { display: flex; align-items: center; gap: 28px; font-size: 13px; font-weight: 500; }
@@ -361,7 +361,7 @@ html[lang="ar"] .lang-ar.block { display:block !important; }
   .header-inner { min-height:78px; }
   .brand { min-width:0; }
   .brand img { width:42px; height:42px; }
-  .brand-copy { display:none; }
+  .brand-copy { display:none; margin-inline-start:0; }
   .hero { padding-top:100px; min-height:720px; }
   .hero-inner { padding-bottom:55px; }
   .hero-bottom { gap:12px; }
