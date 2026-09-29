@@ -1,0 +1,97 @@
+name: Apply site bundle
+
+on:
+  push:
+    paths:
+      - '.deploy/sitebundle.tgz'
+      - '.github/workflows/apply-site-bundle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "alhammadi-site-deploy"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply generated site bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xzf .deploy/sitebundle.tgz -C .
+
+      - name: Import imagery from current Al Hammadi website
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/source-images
+          UA='Mozilla/5.0 (compatible; AlHammadiSiteMigration/1.0)'
+          fetch() { curl -L --fail --retry 3 --connect-timeout 15 --max-time 60 -A "$UA" "$1" -o "$2"; }
+
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2023/08/-3.png' 'assets/source-images/about-current.png' || true
+
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/bylaw.svg' 'assets/source-images/bylaw.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/insurance-1.svg' 'assets/source-images/insurance-1.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/contracts.svg' 'assets/source-images/contracts.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/heritage.svg' 'assets/source-images/heritage.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/commercial.svg' 'assets/source-images/commercial.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/court.svg' 'assets/source-images/court.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/fins.svg' 'assets/source-images/fins.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/profile.svg' 'assets/source-images/profile.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/group-profile.svg' 'assets/source-images/group-profile.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/mangerial-cases.svg' 'assets/source-images/mangerial-cases.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/case-2.svg' 'assets/source-images/case-2.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/small-services.svg' 'assets/source-images/small-services.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/bankruptcy.svg' 'assets/source-images/bankruptcy.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/corporate-governance.svg' 'assets/source-images/corporate-governance.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/family-governance.svg' 'assets/source-images/family-governance.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/mergers-acquisitions.svg' 'assets/source-images/mergers-acquisitions.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/intellectual-property.svg' 'assets/source-images/intellectual-property.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/customs.svg' 'assets/source-images/customs.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/corruption.svg' 'assets/source-images/corruption.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/spos.svg' 'assets/source-images/spos.svg' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/04/more.svg' 'assets/source-images/more.svg' || true
+
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/07/-1-2.png' 'assets/source-images/tourism.png' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/07/--1-1.png' 'assets/source-images/commerce.png' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/07/-1-1.png' 'assets/source-images/industry.png' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/07/-.png' 'assets/source-images/sama.png' || true
+          fetch 'https://alhammadifirm.com/wp-content/uploads/2026/07/.png' 'assets/source-images/aramco.png' || true
+
+      - name: Commit refreshed site
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html about.html practice-areas.html knowledge.html contact.html README.md assets
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refine Al Hammadi website content, responsive UX and imagery'
+            git push
+          else
+            echo 'No site changes to commit.'
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
