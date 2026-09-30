@@ -1,4 +1,112 @@
 (() => {
+  const uiStyle = document.createElement('style');
+  uiStyle.textContent = `
+    /* Screenshot-matched floating contact actions */
+    .floating-actions {
+      gap: 10px !important;
+      align-items: flex-start;
+    }
+    .float-btn {
+      width: 170px !important;
+      height: 58px !important;
+      min-height: 58px !important;
+      padding: 4px 4px 4px 17px !important;
+      border-radius: 22px !important;
+      border: 1px solid #aeb6bb !important;
+      background: #fff !important;
+      color: #26323a !important;
+      display: flex !important;
+      flex-direction: row !important;
+      direction: rtl;
+      justify-content: space-between !important;
+      align-items: center !important;
+      box-shadow: 0 5px 16px rgba(8,10,11,.12) !important;
+      font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif !important;
+      font-size: 17px !important;
+      font-weight: 500 !important;
+      line-height: 1 !important;
+      overflow: hidden;
+    }
+    .float-btn:hover { transform: translateY(-2px); background:#fff !important; }
+    .float-btn svg {
+      order: 0;
+      width: 50px !important;
+      height: 50px !important;
+      min-width: 50px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #22c55e;
+      color: #fff;
+      stroke: currentColor;
+      box-sizing: border-box;
+    }
+    .float-btn::after {
+      order: 1;
+      flex: 1;
+      text-align: center;
+      white-space: nowrap;
+    }
+    html[lang="ar"] .float-btn.whatsapp::after { content: 'واتساب'; }
+    html[lang="ar"] .float-btn.call::after { content: 'اتصل بنا'; }
+    html[lang="en"] .float-btn.whatsapp::after { content: 'WhatsApp'; }
+    html[lang="en"] .float-btn.call::after { content: 'Call us'; }
+
+    /* Make the mobile navigation fully opaque even after sticky-header activation */
+    @media (max-width: 1050px) {
+      .nav.mobile-open {
+        background: #f7f7f4 !important;
+        color: #080A0B !important;
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        isolation: isolate;
+      }
+      .nav.mobile-open::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: #f7f7f4;
+        opacity: 1;
+      }
+      .nav.mobile-open a { color:#080A0B !important; opacity:1 !important; }
+      body.menu-open .site-header,
+      body.menu-open .site-header.is-sticky {
+        background: #f7f7f4 !important;
+        color: #080A0B !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
+      }
+      body.menu-open .menu-toggle,
+      body.menu-open .lang-switch {
+        color:#080A0B !important;
+        border-color:#b7bec2 !important;
+        background:#fff !important;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .floating-actions {
+        inset-inline-end: 14px !important;
+        bottom: max(14px, env(safe-area-inset-bottom)) !important;
+      }
+      .float-btn {
+        width: 158px !important;
+        height: 56px !important;
+        min-height: 56px !important;
+        padding-inline-start: 14px !important;
+        font-size: 16px !important;
+      }
+      .float-btn svg {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px;
+      }
+    }
+  `;
+  document.head.appendChild(uiStyle);
+
   const html = document.documentElement;
   const saved = localStorage.getItem('alhammadi-lang');
   const initial = saved === 'en' ? 'en' : 'ar';
@@ -57,7 +165,6 @@
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
   }
 
-  // Reuse imagery from the current Al Hammadi website, with graceful fallbacks if a legacy asset is unavailable.
   document.querySelectorAll('.visual-panel > img').forEach(img => {
     const fail = () => img.closest('.visual-panel')?.classList.add('image-missing');
     img.addEventListener('error', fail, {once:true});
