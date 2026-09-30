@@ -1,18 +1,18 @@
 (() => {
   const uiStyle = document.createElement('style');
   uiStyle.textContent = `
-    /* Screenshot-matched floating contact actions */
+    /* Compact floating contact actions inspired by the reference site */
     .floating-actions {
-      gap: 10px !important;
+      gap: 7px !important;
       align-items: flex-start;
     }
     .float-btn {
-      width: 170px !important;
-      height: 58px !important;
-      min-height: 58px !important;
-      padding: 4px 4px 4px 17px !important;
-      border-radius: 22px !important;
-      border: 1px solid #aeb6bb !important;
+      width: 140px !important;
+      height: 48px !important;
+      min-height: 48px !important;
+      padding: 3px 3px 3px 12px !important;
+      border-radius: 18px !important;
+      border: 1px solid #b9c0c4 !important;
       background: #fff !important;
       color: #26323a !important;
       display: flex !important;
@@ -20,21 +20,21 @@
       direction: rtl;
       justify-content: space-between !important;
       align-items: center !important;
-      box-shadow: 0 5px 16px rgba(8,10,11,.12) !important;
+      box-shadow: 0 3px 10px rgba(8,10,11,.10) !important;
       font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif !important;
-      font-size: 17px !important;
+      font-size: 14px !important;
       font-weight: 500 !important;
       line-height: 1 !important;
       overflow: hidden;
     }
-    .float-btn:hover { transform: translateY(-2px); background:#fff !important; }
+    .float-btn:hover { transform: translateY(-1px); background:#fff !important; }
     .float-btn svg {
       order: 0;
-      width: 50px !important;
-      height: 50px !important;
-      min-width: 50px;
-      padding: 12px;
-      border-radius: 14px;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px;
+      padding: 9px;
+      border-radius: 12px;
       background: #22c55e;
       color: #fff;
       stroke: currentColor;
@@ -88,20 +88,25 @@
 
     @media (max-width: 680px) {
       .floating-actions {
-        inset-inline-end: 14px !important;
-        bottom: max(14px, env(safe-area-inset-bottom)) !important;
+        inset-inline-end: 10px !important;
+        bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        gap: 6px !important;
       }
       .float-btn {
-        width: 158px !important;
-        height: 56px !important;
-        min-height: 56px !important;
-        padding-inline-start: 14px !important;
-        font-size: 16px !important;
+        width: 126px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 3px 3px 3px 10px !important;
+        border-radius: 17px !important;
+        font-size: 13px !important;
+        box-shadow: 0 2px 8px rgba(8,10,11,.09) !important;
       }
       .float-btn svg {
-        width: 48px !important;
-        height: 48px !important;
-        min-width: 48px;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px;
+        padding: 8px;
+        border-radius: 10px;
       }
     }
   `;
