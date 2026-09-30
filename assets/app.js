@@ -1,7 +1,7 @@
 (() => {
   const uiStyle = document.createElement('style');
   uiStyle.textContent = `
-    /* Compact floating contact actions inspired by the reference site */
+    /* Compact floating contact actions */
     .floating-actions {
       gap: 7px !important;
       align-items: flex-start;
@@ -26,6 +26,7 @@
       font-weight: 500 !important;
       line-height: 1 !important;
       overflow: hidden;
+      will-change: auto !important;
     }
     .float-btn:hover { transform: translateY(-1px); background:#fff !important; }
     .float-btn svg {
@@ -51,7 +52,24 @@
     html[lang="en"] .float-btn.whatsapp::after { content: 'WhatsApp'; }
     html[lang="en"] .float-btn.call::after { content: 'Call us'; }
 
-    /* Make the mobile navigation fully opaque even after sticky-header activation */
+    /* Performance: avoid expensive live blur while scrolling */
+    .site-header.is-sticky {
+      background: #f1f2ef !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Let the browser defer painting long off-screen sections */
+    @supports (content-visibility: auto) {
+      main > .section:not(#contact),
+      main > section.wash,
+      main > section.dark:not(.hero) {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 850px;
+      }
+    }
+
+    /* Make the mobile navigation fully opaque after sticky-header activation */
     @media (max-width: 1050px) {
       .nav.mobile-open {
         background: #f7f7f4 !important;
@@ -99,7 +117,7 @@
         padding: 3px 3px 3px 10px !important;
         border-radius: 17px !important;
         font-size: 13px !important;
-        box-shadow: 0 2px 8px rgba(8,10,11,.09) !important;
+        box-shadow: 0 2px 8px rgba(8,10,11,.08) !important;
       }
       .float-btn svg {
         width: 36px !important;
@@ -108,6 +126,35 @@
         padding: 8px;
         border-radius: 10px;
       }
+      /* Touch devices: shorter, cheaper transitions for a lighter feel */
+      .reveal {
+        transition-duration: .32s !important;
+        transform: translateY(10px);
+      }
+      .reveal.in { transform: none; }
+      .practice-card,
+      .btn-primary,
+      .btn-ghost,
+      .nav a,
+      .link-arrow .arrow {
+        transition-duration: .16s !important;
+      }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .practice-card:hover { transform: none !important; }
+      .practice-card:hover::before { transform: rotate(45deg) !important; }
+      .btn-primary:hover, .float-btn:hover { transform: none !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto !important; }
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; }
     }
   `;
   document.head.appendChild(uiStyle);
@@ -115,6 +162,7 @@
   const html = document.documentElement;
   const saved = localStorage.getItem('alhammadi-lang');
   const initial = saved === 'en' ? 'en' : 'ar';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function setLang(lang) {
     html.lang = lang;
@@ -135,9 +183,18 @@
   });
 
   const header = document.querySelector('.site-header');
-  const onScroll = () => header?.classList.toggle('is-sticky', window.scrollY > 72);
-  onScroll();
-  window.addEventListener('scroll', onScroll, {passive:true});
+  let scrollTicking = false;
+  const syncHeader = () => {
+    header?.classList.toggle('is-sticky', window.scrollY > 72);
+    scrollTicking = false;
+  };
+  syncHeader();
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      scrollTicking = true;
+      requestAnimationFrame(syncHeader);
+    }
+  }, {passive:true});
 
   const menuBtn = document.querySelector('[data-menu-toggle]');
   const nav = document.querySelector('.nav');
@@ -157,18 +214,54 @@
     menuBtn.textContent = open ? '×' : '☰';
     menuBtn.setAttribute('aria-label', open ? (html.lang === 'ar' ? 'إغلاق القائمة' : 'Close menu') : (html.lang === 'ar' ? 'فتح القائمة' : 'Open menu'));
   });
-  nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+  /* Native smooth section navigation, with motion preference respected */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (ev) => {
+      const id = link.getAttribute('href');
+      if (!id || id === '#') return;
+      const target = document.querySelector(id);
+      if (!target) return;
+      ev.preventDefault();
+      closeMenu();
+      target.scrollIntoView({
+        behavior: reduceMotion.matches ? 'auto' : 'smooth',
+        block: 'start'
+      });
+      if (history.replaceState) history.replaceState(null, '', id);
+    });
+  });
+
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
   window.addEventListener('resize', () => { if (window.innerWidth > 1050) closeMenu(); }, {passive:true});
 
-  if ('IntersectionObserver' in window) {
+  if ('IntersectionObserver' in window && !reduceMotion.matches) {
     const io = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: .10, rootMargin: '0px 0px -24px 0px' });
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: .06, rootMargin: '0px 0px -12px 0px' });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   } else {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
   }
+
+  /* Image loading policy: eager only for the hero, lazy for the rest */
+  const heroImage = document.querySelector('.hero-visual > img');
+  if (heroImage) {
+    heroImage.loading = 'eager';
+    heroImage.fetchPriority = 'high';
+    heroImage.decoding = 'async';
+  }
+  document.querySelectorAll('main img').forEach(img => {
+    if (img !== heroImage && !img.closest('.site-header')) {
+      if (!img.hasAttribute('loading')) img.loading = 'lazy';
+      img.decoding = 'async';
+    }
+  });
 
   document.querySelectorAll('.visual-panel > img').forEach(img => {
     const fail = () => img.closest('.visual-panel')?.classList.add('image-missing');
