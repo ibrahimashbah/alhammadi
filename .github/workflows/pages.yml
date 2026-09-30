@@ -37,6 +37,7 @@ jobs:
           s = s.replace('src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"', 'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"')
           s = s.replace('      filter: saturate(.72) contrast(.96);\n    }', '      filter: saturate(.72) contrast(.96);\n      pointer-events: none;\n    }')
           s = s.replace('<div class="office-map-card reveal">', '<div class="office-map-card reveal" role="link" tabindex="0" style="cursor:pointer" onclick="window.open(\'https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic\',\'_blank\',\'noopener\')">')
+          s = s.replace('<span class="lang-ar">زورونا في المكتب</span><span class="lang-en">Visit our office</span>', '<span class="lang-ar">زورونا في الشركة</span><span class="lang-en">Visit our firm</span>')
           s = s.replace('<span class="lang-ar">مكتبنا في قلب الرياض.</span><span class="lang-en">Our office in the heart of Riyadh.</span>', '<span class="lang-ar">شركتنا في قلب الرياض.</span><span class="lang-en">Our firm in the heart of Riyadh.</span>')
 
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
@@ -47,6 +48,11 @@ jobs:
 
           index = Path('index.html')
           h = index.read_text(encoding='utf-8')
+          old_hero = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Riyadh_North_Skyline_.jpg/1280px-Riyadh_North_Skyline_.jpg'
+          new_hero = 'https://commons.wikimedia.org/wiki/Special:Redirect/file/KAFD_59.jpg?width=1280'
+          h = h.replace(old_hero, new_hero)
+          h = h.replace('صورة الرياض: B.alotaby / Wikimedia Commons، ترخيص CC BY-SA 4.0 — تم قصّها بصرياً داخل التصميم.', 'صورة الرياض: Kolaiel / Wikimedia Commons، CC0 — تم قصّها بصرياً داخل التصميم.')
+          h = h.replace('Riyadh photo: B.alotaby / Wikimedia Commons, CC BY-SA 4.0 — visually cropped in layout.', 'Riyadh photo: Kolaiel / Wikimedia Commons, CC0 — visually cropped in layout.')
           aramco = '      <div class="partner-logo reveal"><img src="assets/source-images/aramco.png" alt="أرامكو السعودية" loading="lazy"><span><span class="lang-ar">أرامكو السعودية</span><span class="lang-en">Saudi Aramco</span></span></div>'
           justice = '      <div class="partner-logo reveal"><img src="assets/source-images/justice.svg" alt="وزارة العدل" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>'
           if 'assets/source-images/justice.svg' not in h and aramco in h:
