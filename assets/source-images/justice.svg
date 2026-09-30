@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120" role="img" aria-label="وزارة العدل">
+  <g fill="none" stroke="#6f7375" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M110 18v68"/>
+    <path d="M82 34h56"/>
+    <path d="M110 18l-8 10h16l-8-10Z" fill="#6f7375" stroke="none"/>
+    <path d="M82 34 64 65h36L82 34Z"/>
+    <path d="M138 34 120 65h36l-18-31Z"/>
+    <path d="M68 68c4 8 24 8 28 0"/>
+    <path d="M124 68c4 8 24 8 28 0"/>
+    <path d="M93 91h34"/>
+    <path d="M87 99h46"/>
+  </g>
+  <g fill="#6f7375">
+    <path d="M110 8c7 6 10 11 10 17-6-1-10-5-10-17Z" opacity=".9"/>
+    <path d="M105 14c-7 4-11 8-12 13 6 0 10-3 12-13Z" opacity=".75"/>
+  </g>
+</svg>
