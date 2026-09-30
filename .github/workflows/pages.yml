@@ -27,6 +27,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+
           p = Path('assets/app.js')
           s = p.read_text(encoding='utf-8')
           s = s.replace('<div class="google-rating-score" dir="ltr">—</div>', '<div class="google-rating-score" dir="ltr">5.0</div>')
@@ -36,11 +37,22 @@ jobs:
           s = s.replace('src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"', 'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"')
           s = s.replace('      filter: saturate(.72) contrast(.96);\n    }', '      filter: saturate(.72) contrast(.96);\n      pointer-events: none;\n    }')
           s = s.replace('<div class="office-map-card reveal">', '<div class="office-map-card reveal" role="link" tabindex="0" style="cursor:pointer" onclick="window.open(\'https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic\',\'_blank\',\'noopener\')">')
+          s = s.replace('<span class="lang-ar">مكتبنا في قلب الرياض.</span><span class="lang-en">Our office in the heart of Riyadh.</span>', '<span class="lang-ar">شركتنا في قلب الرياض.</span><span class="lang-en">Our firm in the heart of Riyadh.</span>')
+
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
           consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
           if marker in s and 'أحتاج استشارة قانونية' not in s:
               s = s.replace(marker, consultation_patch + marker, 1)
           p.write_text(s, encoding='utf-8')
+
+          index = Path('index.html')
+          h = index.read_text(encoding='utf-8')
+          aramco = '      <div class="partner-logo reveal"><img src="assets/source-images/aramco.png" alt="أرامكو السعودية" loading="lazy"><span><span class="lang-ar">أرامكو السعودية</span><span class="lang-en">Saudi Aramco</span></span></div>'
+          justice = '      <div class="partner-logo reveal"><img src="assets/source-images/justice.svg" alt="وزارة العدل" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>'
+          if 'assets/source-images/justice.svg' not in h and aramco in h:
+              h = h.replace(aramco, aramco + '\n' + justice, 1)
+          index.write_text(h, encoding='utf-8')
+
           css = Path('assets/styles.css')
           c = css.read_text(encoding='utf-8')
           alignment = "\n\n/* Locale-consistent metric alignment */\n.metrics .metric { display:flex !important; flex-direction:column !important; justify-content:flex-start !important; }\n.metrics .metric > strong, .metrics .metric > span { width:100% !important; margin-inline:0 !important; }\nhtml[dir=\"rtl\"] .metrics .metric, html[dir=\"rtl\"] .metrics .metric > strong, html[dir=\"rtl\"] .metrics .metric > span { text-align:right !important; }\nhtml[dir=\"ltr\"] .metrics .metric, html[dir=\"ltr\"] .metrics .metric > strong, html[dir=\"ltr\"] .metrics .metric > span { text-align:left !important; }\n"
