@@ -47,6 +47,36 @@ jobs:
               s = s.replace(marker, consultation_patch + marker, 1)
 
           p.write_text(s, encoding='utf-8')
+
+          css = Path('assets/styles.css')
+          c = css.read_text(encoding='utf-8')
+          alignment = '''
+
+/* Locale-consistent metric alignment */
+.metrics .metric {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+.metrics .metric > strong,
+.metrics .metric > span {
+  width: 100% !important;
+  margin-inline: 0 !important;
+}
+html[dir="rtl"] .metrics .metric,
+html[dir="rtl"] .metrics .metric > strong,
+html[dir="rtl"] .metrics .metric > span {
+  text-align: right !important;
+}
+html[dir="ltr"] .metrics .metric,
+html[dir="ltr"] .metrics .metric > strong,
+html[dir="ltr"] .metrics .metric > span {
+  text-align: left !important;
+}
+'''
+          if 'Locale-consistent metric alignment' not in c:
+              c += alignment
+          css.write_text(c, encoding='utf-8')
           PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
