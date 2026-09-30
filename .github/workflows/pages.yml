@@ -23,11 +23,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Apply verified Google Maps rating
+      - name: Apply verified Google Maps refinements
         run: |
-          sed -i 's/<div class="google-rating-score" dir="ltr">—<\/div>/<div class="google-rating-score" dir="ltr">5.0<\/div>/' assets/app.js
-          sed -i 's/0 تقييم على Google/86 تقييمًا على Google/' assets/app.js
-          sed -i 's/0 Google reviews/86 Google reviews/' assets/app.js
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('assets/app.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('<div class="google-rating-score" dir="ltr">—</div>', '<div class="google-rating-score" dir="ltr">5.0</div>')
+          s = s.replace('0 تقييم على Google', '86 تقييمًا على Google')
+          s = s.replace('0 Google reviews', '86 Google reviews')
+          s = s.replace('.google-rating-stars svg { width: 13px; height: 13px; }', '.google-rating-stars svg { width: 13px; height: 13px; fill: currentColor; stroke: currentColor; }')
+          s = s.replace(
+              'src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"',
+              'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"'
+          )
+          p.write_text(s, encoding='utf-8')
+          PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
