@@ -23,10 +23,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Apply verified Google Maps and consultation refinements
+      - name: Apply site refinements
         run: |
           python - <<'PY'
           from pathlib import Path
+
           p = Path('assets/app.js')
           s = p.read_text(encoding='utf-8')
           s = s.replace('<div class="google-rating-score" dir="ltr">—</div>', '<div class="google-rating-score" dir="ltr">5.0</div>')
@@ -42,7 +43,7 @@ jobs:
           if marker in s and 'const officeMapCard =' not in s:
               s = s.replace(marker, click_patch + marker, 1)
 
-          consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar'\n        ? 'السلام عليكم، أحتاج استشارة قانونية.'\n        : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
+          consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
           if marker in s and 'أحتاج استشارة قانونية' not in s:
               s = s.replace(marker, consultation_patch + marker, 1)
 
@@ -50,30 +51,7 @@ jobs:
 
           css = Path('assets/styles.css')
           c = css.read_text(encoding='utf-8')
-          alignment = '''
-
-/* Locale-consistent metric alignment */
-.metrics .metric {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-}
-.metrics .metric > strong,
-.metrics .metric > span {
-  width: 100% !important;
-  margin-inline: 0 !important;
-}
-html[dir="rtl"] .metrics .metric,
-html[dir="rtl"] .metrics .metric > strong,
-html[dir="rtl"] .metrics .metric > span {
-  text-align: right !important;
-}
-html[dir="ltr"] .metrics .metric,
-html[dir="ltr"] .metrics .metric > strong,
-html[dir="ltr"] .metrics .metric > span {
-  text-align: left !important;
-}
-'''
+          alignment = "\n\n/* Locale-consistent metric alignment */\n.metrics .metric { display:flex !important; flex-direction:column !important; justify-content:flex-start !important; }\n.metrics .metric > strong, .metrics .metric > span { width:100% !important; margin-inline:0 !important; }\nhtml[dir=\"rtl\"] .metrics .metric, html[dir=\"rtl\"] .metrics .metric > strong, html[dir=\"rtl\"] .metrics .metric > span { text-align:right !important; }\nhtml[dir=\"ltr\"] .metrics .metric, html[dir=\"ltr\"] .metrics .metric > strong, html[dir=\"ltr\"] .metrics .metric > span { text-align:left !important; }\n"
           if 'Locale-consistent metric alignment' not in c:
               c += alignment
           css.write_text(c, encoding='utf-8')
