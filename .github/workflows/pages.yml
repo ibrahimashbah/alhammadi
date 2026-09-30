@@ -27,7 +27,6 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-
           p = Path('assets/app.js')
           s = p.read_text(encoding='utf-8')
           s = s.replace('<div class="google-rating-score" dir="ltr">—</div>', '<div class="google-rating-score" dir="ltr">5.0</div>')
@@ -36,59 +35,18 @@ jobs:
           s = s.replace('.google-rating-stars svg { width: 13px; height: 13px; }', '.google-rating-stars svg { width: 13px; height: 13px; fill: currentColor; stroke: currentColor; }')
           s = s.replace('src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"', 'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"')
           s = s.replace('      filter: saturate(.72) contrast(.96);\n    }', '      filter: saturate(.72) contrast(.96);\n      pointer-events: none;\n    }')
-
-          map_overlay_css = '''
-    .office-map-link {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      display: block;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-    }
-    .office-map-open-chip {
-      position: absolute;
-      top: 16px;
-      inset-inline-start: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 0 14px;
-      border: 1px solid rgba(8,10,11,.14);
-      background: rgba(255,255,255,.96);
-      color: #102A32;
-      box-shadow: 0 5px 18px rgba(8,10,11,.13);
-      font-size: 13px;
-      font-weight: 600;
-      pointer-events: none;
-    }
-    .office-map-link:focus-visible {
-      outline: 3px solid #D3BC74;
-      outline-offset: -3px;
-    }
-'''
+          map_css = "\n    .office-map-link { position:absolute; inset:0; z-index:4; display:block; cursor:pointer; text-decoration:none; color:inherit; }\n    .office-map-open-chip { position:absolute; top:16px; inset-inline-start:16px; display:inline-flex; align-items:center; gap:8px; min-height:42px; padding:0 14px; border:1px solid rgba(8,10,11,.14); background:rgba(255,255,255,.96); color:#102A32; box-shadow:0 5px 18px rgba(8,10,11,.13); font-size:13px; font-weight:600; pointer-events:none; }\n    .office-map-link:focus-visible { outline:3px solid #D3BC74; outline-offset:-3px; }\n"
           if '.office-map-link {' not in s:
-              s = s.replace('    .office-map-badge {', map_overlay_css + '\n    .office-map-badge {', 1)
-
-          map_overlay_html = '''
-            <a class="office-map-link" href="https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic" target="_blank" rel="noopener" aria-label="Open Ahmad Al Hammadi Law Firm in Google Maps">
-              <span class="office-map-open-chip"><span class="lang-ar">فتح في Google Maps</span><span class="lang-en">Open in Google Maps</span> <span aria-hidden="true">↗</span></span>
-            </a>
-'''
-          needle = '''            </iframe>
-            <div class="office-map-badge">'''
+              s = s.replace('    .office-map-badge {', map_css + '\n    .office-map-badge {', 1)
+          overlay = '            <a class="office-map-link" href="https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic" target="_blank" rel="noopener" aria-label="Open Ahmad Al Hammadi Law Firm in Google Maps">\n              <span class="office-map-open-chip"><span class="lang-ar">فتح في Google Maps</span><span class="lang-en">Open in Google Maps</span> <span aria-hidden="true">↗</span></span>\n            </a>\n'
+          needle = '            </iframe>\n            <div class="office-map-badge">'
           if needle in s and 'class="office-map-link"' not in s:
-              s = s.replace(needle, '            </iframe>\n' + map_overlay_html + '            <div class="office-map-badge">', 1)
-
+              s = s.replace(needle, '            </iframe>\n' + overlay + '            <div class="office-map-badge">', 1)
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
           consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
           if marker in s and 'أحتاج استشارة قانونية' not in s:
               s = s.replace(marker, consultation_patch + marker, 1)
-
           p.write_text(s, encoding='utf-8')
-
           css = Path('assets/styles.css')
           c = css.read_text(encoding='utf-8')
           alignment = "\n\n/* Locale-consistent metric alignment */\n.metrics .metric { display:flex !important; flex-direction:column !important; justify-content:flex-start !important; }\n.metrics .metric > strong, .metrics .metric > span { width:100% !important; margin-inline:0 !important; }\nhtml[dir=\"rtl\"] .metrics .metric, html[dir=\"rtl\"] .metrics .metric > strong, html[dir=\"rtl\"] .metrics .metric > span { text-align:right !important; }\nhtml[dir=\"ltr\"] .metrics .metric, html[dir=\"ltr\"] .metrics .metric > strong, html[dir=\"ltr\"] .metrics .metric > span { text-align:left !important; }\n"
