@@ -23,6 +23,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Apply verified Google Maps rating
+        run: |
+          sed -i 's/<div class="google-rating-score" dir="ltr">—<\/div>/<div class="google-rating-score" dir="ltr">5.0<\/div>/' assets/app.js
+          sed -i 's/0 تقييم على Google/86 تقييمًا على Google/' assets/app.js
+          sed -i 's/0 Google reviews/86 Google reviews/' assets/app.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
