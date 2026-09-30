@@ -37,12 +37,52 @@ jobs:
           s = s.replace('src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"', 'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"')
           s = s.replace('      filter: saturate(.72) contrast(.96);\n    }', '      filter: saturate(.72) contrast(.96);\n      pointer-events: none;\n    }')
 
+          map_overlay_css = '''
+    .office-map-link {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: block;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .office-map-open-chip {
+      position: absolute;
+      top: 16px;
+      inset-inline-start: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(8,10,11,.14);
+      background: rgba(255,255,255,.96);
+      color: #102A32;
+      box-shadow: 0 5px 18px rgba(8,10,11,.13);
+      font-size: 13px;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    .office-map-link:focus-visible {
+      outline: 3px solid #D3BC74;
+      outline-offset: -3px;
+    }
+'''
+          if '.office-map-link {' not in s:
+              s = s.replace('    .office-map-badge {', map_overlay_css + '\n    .office-map-badge {', 1)
+
+          map_overlay_html = '''
+            <a class="office-map-link" href="https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic" target="_blank" rel="noopener" aria-label="Open Ahmad Al Hammadi Law Firm in Google Maps">
+              <span class="office-map-open-chip"><span class="lang-ar">فتح في Google Maps</span><span class="lang-en">Open in Google Maps</span> <span aria-hidden="true">↗</span></span>
+            </a>
+'''
+          needle = '''            </iframe>
+            <div class="office-map-badge">'''
+          if needle in s and 'class="office-map-link"' not in s:
+              s = s.replace(needle, '            </iframe>\n' + map_overlay_html + '            <div class="office-map-badge">', 1)
+
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
-
-          click_patch = "  const officeMapCard = document.querySelector('.office-map-card');\n  if (officeMapCard) {\n    officeMapCard.setAttribute('role', 'link');\n    officeMapCard.setAttribute('tabindex', '0');\n    officeMapCard.setAttribute('aria-label', 'Open Ahmad Al Hammadi Law Firm in Google Maps');\n    officeMapCard.style.cursor = 'pointer';\n    const openOfficeMap = () => window.open('https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic', '_blank', 'noopener');\n    officeMapCard.addEventListener('click', openOfficeMap);\n    officeMapCard.addEventListener('keydown', (e) => {\n      if (e.key === 'Enter' || e.key === ' ') {\n        e.preventDefault();\n        openOfficeMap();\n      }\n    });\n  }\n\n"
-          if marker in s and 'const officeMapCard =' not in s:
-              s = s.replace(marker, click_patch + marker, 1)
-
           consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
           if marker in s and 'أحتاج استشارة قانونية' not in s:
               s = s.replace(marker, consultation_patch + marker, 1)
