@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Apply verified Google Maps refinements
+      - name: Apply verified Google Maps and consultation refinements
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -35,10 +35,17 @@ jobs:
           s = s.replace('.google-rating-stars svg { width: 13px; height: 13px; }', '.google-rating-stars svg { width: 13px; height: 13px; fill: currentColor; stroke: currentColor; }')
           s = s.replace('src="https://www.google.com/maps?q=Liwa%20Center%20Building%2C%20King%20Fahd%2C%20Riyadh%2012274%2C%20Saudi%20Arabia&output=embed"', 'src="https://www.google.com/maps?q=Ahmad%20Al%20Hammadi%20Law%20Firm%2C%20Riyadh%2C%20Saudi%20Arabia&output=embed"')
           s = s.replace('      filter: saturate(.72) contrast(.96);\n    }', '      filter: saturate(.72) contrast(.96);\n      pointer-events: none;\n    }')
+
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
+
           click_patch = "  const officeMapCard = document.querySelector('.office-map-card');\n  if (officeMapCard) {\n    officeMapCard.setAttribute('role', 'link');\n    officeMapCard.setAttribute('tabindex', '0');\n    officeMapCard.setAttribute('aria-label', 'Open Ahmad Al Hammadi Law Firm in Google Maps');\n    officeMapCard.style.cursor = 'pointer';\n    const openOfficeMap = () => window.open('https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic', '_blank', 'noopener');\n    officeMapCard.addEventListener('click', openOfficeMap);\n    officeMapCard.addEventListener('keydown', (e) => {\n      if (e.key === 'Enter' || e.key === ' ') {\n        e.preventDefault();\n        openOfficeMap();\n      }\n    });\n  }\n\n"
           if marker in s and 'const officeMapCard =' not in s:
               s = s.replace(marker, click_patch + marker, 1)
+
+          consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar'\n        ? 'السلام عليكم، أحتاج استشارة قانونية.'\n        : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
+          if marker in s and 'أحتاج استشارة قانونية' not in s:
+              s = s.replace(marker, consultation_patch + marker, 1)
+
           p.write_text(s, encoding='utf-8')
           PY
       - name: Configure Pages
