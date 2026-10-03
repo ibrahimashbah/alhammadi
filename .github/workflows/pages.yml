@@ -28,6 +28,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
+          # Runtime UI refinements
           p = Path('assets/app.js')
           s = p.read_text(encoding='utf-8')
           s = s.replace('<div class="google-rating-score" dir="ltr">—</div>', '<div class="google-rating-score" dir="ltr">5.0</div>')
@@ -41,29 +42,57 @@ jobs:
           s = s.replace('<span class="lang-ar">مكتبنا في قلب الرياض.</span><span class="lang-en">Our office in the heart of Riyadh.</span>', '<span class="lang-ar">شركتنا في قلب الرياض.</span><span class="lang-en">Our firm in the heart of Riyadh.</span>')
 
           marker = "  document.querySelectorAll('[data-lang-switch]').forEach(btn => {"
-          consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"], .link-arrow[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
+          consultation_patch = "  document.querySelectorAll('.hero .btn-primary[href=\"#contact\"]').forEach(link => {\n    link.addEventListener('click', (ev) => {\n      ev.preventDefault();\n      ev.stopImmediatePropagation();\n      const message = html.lang === 'ar' ? 'السلام عليكم، أحتاج استشارة قانونية.' : 'Hello, I would like to request a legal consultation.';\n      window.open(`https://wa.me/966555334489?text=${encodeURIComponent(message)}`, '_blank', 'noopener');\n    });\n  });\n\n"
           if marker in s and 'أحتاج استشارة قانونية' not in s:
               s = s.replace(marker, consultation_patch + marker, 1)
           p.write_text(s, encoding='utf-8')
 
+          # Homepage content cleanup
           index = Path('index.html')
           h = index.read_text(encoding='utf-8')
           old_hero = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Riyadh_North_Skyline_.jpg/1280px-Riyadh_North_Skyline_.jpg'
-          new_hero = 'https://commons.wikimedia.org/wiki/Special:Redirect/file/KAFD_59.jpg?width=1280'
+          new_hero = 'https://commons.wikimedia.org/wiki/Special:Redirect/file/KAFD_59.jpg?width=1920'
           h = h.replace(old_hero, new_hero)
           h = h.replace('صورة الرياض: B.alotaby / Wikimedia Commons، ترخيص CC BY-SA 4.0 — تم قصّها بصرياً داخل التصميم.', 'صورة الرياض: Kolaiel / Wikimedia Commons، CC0 — تم قصّها بصرياً داخل التصميم.')
           h = h.replace('Riyadh photo: B.alotaby / Wikimedia Commons, CC BY-SA 4.0 — visually cropped in layout.', 'Riyadh photo: Kolaiel / Wikimedia Commons, CC0 — visually cropped in layout.')
+
+          # Remove one repeated company/team paragraph from About.
+          repeated_about = '<p><span class="lang-ar">نقدّم خدماتنا من خلال محامين ومستشارين ومحكمين ذوي خبرات واسعة ومعرفة قضائية متخصصة، مع الحرص على تلبية احتياجات العملاء في القطاعات العامة والخاصة بمهنية ووضوح، والالتزام بأعلى معايير الجودة والاحترافية والسرية.</span><span class="lang-en">Our services are delivered by lawyers, consultants and arbitrators with broad experience and specialist judicial knowledge, serving public and private sector clients with professionalism, clarity and a strong commitment to quality and confidentiality.</span></p>'
+          h = h.replace(repeated_about, '')
+
+          # Keep consultation CTA only in the hero + form, not again after legal knowledge.
+          knowledge_cta = '<a class="link-arrow" href="#contact"><span class="lang-ar">طلب استشارة قانونية</span><span class="lang-en">Request legal advice</span> <span class="arrow">↗</span></a>'
+          h = h.replace(knowledge_cta, '')
+
+          # Floating contact actions already exist, so remove duplicate direct WhatsApp/call buttons in Contact.
+          contact_actions = '<div class="contact-actions"><a class="btn-primary" href="https://wa.me/966555334489" target="_blank" rel="noopener">WhatsApp ↗</a><a class="btn-ghost" href="tel:+966555334489"><span class="lang-ar">اتصال مباشر</span><span class="lang-en">Call now</span> ↗</a></div>'
+          h = h.replace(contact_actions, '')
+
+          # Shorter footer copy + verified X account; remove repeated phone/WhatsApp links from footer.
+          footer_long = '<p><span class="lang-ar">شركة قانونية سعودية متخصصة، تقدم حلولاً قانونية متكاملة للأفراد والشركات، مستندة إلى المعرفة القانونية العميقة والخبرة العملية والفهم الدقيق للأنظمة واللوائح في المملكة العربية السعودية.</span><span class="lang-en">A specialised Saudi law firm providing integrated legal solutions to individuals and businesses, grounded in legal knowledge, practical experience and a precise understanding of Saudi laws and regulations.</span></p>'
+          footer_short = '<p><span class="lang-ar">شركة قانونية سعودية متخصصة مقرها الرياض.</span><span class="lang-en">A specialised Saudi law firm based in Riyadh.</span></p>'
+          h = h.replace(footer_long, footer_short)
+          footer_contact = '<div><h4><span class="lang-ar">التواصل</span><span class="lang-en">Contact</span></h4><div class="footer-links"><a href="tel:+966555334489" dir="ltr">+966 55 533 4489</a><a href="https://wa.me/966555334489" target="_blank" rel="noopener">WhatsApp</a><span><span class="lang-ar">الرياض، المملكة العربية السعودية</span><span class="lang-en">Riyadh, Saudi Arabia</span></span></div></div>'
+          footer_social = '<div><h4><span class="lang-ar">تابعونا</span><span class="lang-en">Follow</span></h4><div class="footer-links"><a href="https://x.com/Ahmadlaw81" target="_blank" rel="noopener">X · @Ahmadlaw81 ↗</a><a href="https://maps.app.goo.gl/jYjyMW6sqA4fEF4r7?g_st=ic" target="_blank" rel="noopener"><span class="lang-ar">Google Maps ↗</span><span class="lang-en">Google Maps ↗</span></a><span><span class="lang-ar">الرياض، المملكة العربية السعودية</span><span class="lang-en">Riyadh, Saudi Arabia</span></span></div></div>'
+          h = h.replace(footer_contact, footer_social)
+
+          # Ministry of Justice sixth partner tile.
           aramco = '      <div class="partner-logo reveal"><img src="assets/source-images/aramco.png" alt="أرامكو السعودية" loading="lazy"><span><span class="lang-ar">أرامكو السعودية</span><span class="lang-en">Saudi Aramco</span></span></div>'
           justice = '      <div class="partner-logo reveal"><img src="assets/source-images/justice.svg" alt="وزارة العدل" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>'
           if 'assets/source-images/justice.svg' not in h and aramco in h:
               h = h.replace(aramco, aramco + '\n' + justice, 1)
           index.write_text(h, encoding='utf-8')
 
+          # Final visual refinements: full-bleed KAFD hero, locale metric alignment.
           css = Path('assets/styles.css')
           c = css.read_text(encoding='utf-8')
           alignment = "\n\n/* Locale-consistent metric alignment */\n.metrics .metric { display:flex !important; flex-direction:column !important; justify-content:flex-start !important; }\n.metrics .metric > strong, .metrics .metric > span { width:100% !important; margin-inline:0 !important; }\nhtml[dir=\"rtl\"] .metrics .metric, html[dir=\"rtl\"] .metrics .metric > strong, html[dir=\"rtl\"] .metrics .metric > span { text-align:right !important; }\nhtml[dir=\"ltr\"] .metrics .metric, html[dir=\"ltr\"] .metrics .metric > strong, html[dir=\"ltr\"] .metrics .metric > span { text-align:left !important; }\n"
           if 'Locale-consistent metric alignment' not in c:
               c += alignment
+
+          hero_bg = r'''\n\n/* Full-bleed Riyadh / KAFD hero */\n.hero {\n  position: relative !important;\n  min-height: min(820px, 88vh) !important;\n  background:\n    linear-gradient(90deg, rgba(5,18,23,.94) 0%, rgba(5,18,23,.80) 42%, rgba(5,18,23,.36) 72%, rgba(5,18,23,.26) 100%),\n    url('https://commons.wikimedia.org/wiki/Special:Redirect/file/KAFD_59.jpg?width=1920') center 48% / cover no-repeat !important;\n}\n.hero .hero-grid { grid-template-columns: minmax(0, 900px) !important; }\n.hero .hero-copy { max-width: 860px !important; position: relative; z-index: 2; }\n.hero .hero-visual { display: none !important; }\n.hero .display, .hero .hero-sub { text-shadow: 0 2px 22px rgba(0,0,0,.28); }\n@media (max-width: 680px) {\n  .hero {\n    min-height: 720px !important;\n    background:\n      linear-gradient(180deg, rgba(5,18,23,.70) 0%, rgba(5,18,23,.88) 55%, rgba(5,18,23,.97) 100%),\n      url('https://commons.wikimedia.org/wiki/Special:Redirect/file/KAFD_59.jpg?width=1280') 56% center / cover no-repeat !important;\n  }\n  .hero .hero-copy { padding-top: 30px; }\n}\n'''
+          if 'Full-bleed Riyadh / KAFD hero' not in c:
+              c += hero_bg
           css.write_text(c, encoding='utf-8')
           PY
       - name: Configure Pages
