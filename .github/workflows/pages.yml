@@ -35,6 +35,9 @@ jobs:
       - name: Apply site refinements
         run: python .github/scripts/refine.py
 
+      - name: Inject Google tracking
+        run: python .github/scripts/inject_tracking.py
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
