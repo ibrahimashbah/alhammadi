@@ -23,6 +23,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download KAFD hero locally
+        run: |
+          mkdir -p assets
+          curl -L --fail --retry 3 --retry-delay 2 \
+            -o assets/kafd-hero.jpg \
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/KAFD_59.jpg/1920px-KAFD_59.jpg"
+          test -s assets/kafd-hero.jpg
+
       - name: Apply site refinements
         run: |
           python - <<'PY'
@@ -52,17 +61,16 @@ jobs:
           index = Path('index.html')
           h = index.read_text(encoding='utf-8')
           old_hero = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Riyadh_North_Skyline_.jpg/1280px-Riyadh_North_Skyline_.jpg'
-          new_hero = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/KAFD_59.jpg/1920px-KAFD_59.jpg'
-          h = h.replace(old_hero, new_hero)
+          h = h.replace(old_hero, 'assets/kafd-hero.jpg')
           h = h.replace('صورة الرياض: B.alotaby / Wikimedia Commons، ترخيص CC BY-SA 4.0 — تم قصّها بصرياً داخل التصميم.', 'صورة الرياض: Kolaiel / Wikimedia Commons، CC0 — تم قصّها بصرياً داخل التصميم.')
           h = h.replace('Riyadh photo: B.alotaby / Wikimedia Commons, CC BY-SA 4.0 — visually cropped in layout.', 'Riyadh photo: Kolaiel / Wikimedia Commons, CC0 — visually cropped in layout.')
 
           # Make the hero truly full-bleed: remove the old side-image figure from deployed markup.
           h = re.sub(r'\s*<figure class="hero-visual reveal">.*?</figure>', '', h, count=1, flags=re.S)
 
-          # Force fresh CSS/JS on phones after the hero change (avoids stale Safari cache).
-          h = h.replace('href="assets/styles.css"', 'href="assets/styles.css?v=20261003-hero-direct"')
-          h = h.replace('src="assets/app.js"', 'src="assets/app.js?v=20261003-hero-direct"')
+          # Force fresh CSS/JS on phones after the hero change.
+          h = re.sub(r'href="assets/styles\.css(?:\?[^\"]*)?"', 'href="assets/styles.css?v=20261004-localhero"', h)
+          h = re.sub(r'src="assets/app\.js(?:\?[^\"]*)?"', 'src="assets/app.js?v=20261004-localhero"', h)
 
           repeated_about = '<p><span class="lang-ar">نقدّم خدماتنا من خلال محامين ومستشارين ومحكمين ذوي خبرات واسعة ومعرفة قضائية متخصصة، مع الحرص على تلبية احتياجات العملاء في القطاعات العامة والخاصة بمهنية ووضوح، والالتزام بأعلى معايير الجودة والاحترافية والسرية.</span><span class="lang-en">Our services are delivered by lawyers, consultants and arbitrators with broad experience and specialist judicial knowledge, serving public and private sector clients with professionalism, clarity and a strong commitment to quality and confidentiality.</span></p>'
           h = h.replace(repeated_about, '')
@@ -93,10 +101,11 @@ jobs:
           if 'Locale-consistent metric alignment' not in c:
               c += alignment
 
-          hero_bg = r'''\n\n/* Full-bleed Riyadh / KAFD hero */\n.hero {\n  position: relative !important;\n  min-height: min(820px, 88vh) !important;\n  background:\n    linear-gradient(90deg, rgba(5,18,23,.95) 0%, rgba(5,18,23,.82) 42%, rgba(5,18,23,.42) 72%, rgba(5,18,23,.30) 100%),\n    url('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/KAFD_59.jpg/1920px-KAFD_59.jpg') center 48% / cover no-repeat !important;\n}\n.hero::before { background: linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.12)) !important; opacity:1 !important; }\n.hero::after { display:none !important; }\n.hero .hero-grid { grid-template-columns: minmax(0, 900px) !important; }\n.hero .hero-copy { max-width: 860px !important; position: relative; z-index: 2; }\n.hero .hero-visual { display: none !important; }\n.hero .display, .hero .hero-sub { text-shadow: 0 2px 22px rgba(0,0,0,.32); }\n@media (max-width: 680px) {\n  .hero {\n    min-height: 720px !important;\n    background:\n      linear-gradient(180deg, rgba(5,18,23,.66) 0%, rgba(5,18,23,.84) 54%, rgba(5,18,23,.97) 100%),\n      url('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/KAFD_59.jpg/1280px-KAFD_59.jpg') 56% center / cover no-repeat !important;\n  }\n  .hero .hero-copy { padding-top: 30px; }\n}\n'''
+          hero_bg = r'''\n\n/* Full-bleed Riyadh / KAFD hero - local bundled asset */\n.hero {\n  position: relative !important;\n  min-height: min(820px, 88vh) !important;\n  background:\n    linear-gradient(90deg, rgba(5,18,23,.95) 0%, rgba(5,18,23,.82) 42%, rgba(5,18,23,.42) 72%, rgba(5,18,23,.30) 100%),\n    url('kafd-hero.jpg') center 48% / cover no-repeat !important;\n}\n.hero::before { background: linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.12)) !important; opacity:1 !important; }\n.hero::after { display:none !important; }\n.hero .hero-grid { grid-template-columns: minmax(0, 900px) !important; }\n.hero .hero-copy { max-width: 860px !important; position: relative; z-index: 2; }\n.hero .hero-visual { display: none !important; }\n.hero .display, .hero .hero-sub { text-shadow: 0 2px 22px rgba(0,0,0,.32); }\n@media (max-width: 680px) {\n  .hero {\n    min-height: 720px !important;\n    background:\n      linear-gradient(180deg, rgba(5,18,23,.66) 0%, rgba(5,18,23,.84) 54%, rgba(5,18,23,.97) 100%),\n      url('kafd-hero.jpg') 56% center / cover no-repeat !important;\n  }\n  .hero .hero-copy { padding-top: 30px; }\n}\n'''
           c += hero_bg
           css.write_text(c, encoding='utf-8')
           PY
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
