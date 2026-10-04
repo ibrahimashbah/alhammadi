@@ -35,6 +35,9 @@ jobs:
       - name: Apply site refinements
         run: python .github/scripts/refine.py
 
+      - name: Apply client notes
+        run: python .github/scripts/apply_client_notes.py
+
       - name: Inject Google tracking
         run: python .github/scripts/inject_tracking.py
 
