@@ -32,11 +32,29 @@ jobs:
             "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/KAFD_59.jpg/1920px-KAFD_59.jpg"
           test -s assets/kafd-hero.jpg
 
+      - name: Download verified partner logos
+        run: |
+          mkdir -p assets
+          curl -L --fail --retry 2 -o assets/partner-lulu.png "https://upload.wikimedia.org/wikipedia/commons/a/ab/Lulu_Hypermarket_logo.png" || true
+          curl -L --fail --retry 2 -o assets/partner-reu.jpg "https://w-alaloum.edu.sa/Media/Partners%20Logo/P_Logo%202.jpg" || true
+          curl -L --fail --retry 2 -o assets/partner-diriyah.jpg "https://api.joodeskan.sa/storage/uploads/contents/images/6024c8320fbda.jpg" || true
+          curl -L --fail --retry 2 -o assets/partner-shgardi.png "https://dl.memuplay.com/new_market/img/com.mnasat.nashmi.icon.2025-01-22-10-37-16.png" || true
+          curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true
+
       - name: Apply site refinements
         run: python .github/scripts/refine.py
 
       - name: Apply client notes
         run: python .github/scripts/apply_client_notes.py
+
+      - name: Sync approved profile core
+        run: python .github/scripts/profile_core.py
+
+      - name: Sync approved practice areas
+        run: python .github/scripts/profile_practices.py
+
+      - name: Sync approved partners and resources
+        run: python .github/scripts/profile_partners.py
 
       - name: Inject Google tracking
         run: python .github/scripts/inject_tracking.py
