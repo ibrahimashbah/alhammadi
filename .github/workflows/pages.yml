@@ -59,6 +59,9 @@ jobs:
       - name: Apply partner asset fallbacks
         run: python .github/scripts/partner_asset_fallbacks.py
 
+      - name: Compact one-page layout
+        run: python .github/scripts/compact_home.py
+
       - name: Inject Google tracking
         run: python .github/scripts/inject_tracking.py
 
