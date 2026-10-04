@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p assets
           curl -L --fail --retry 2 -o assets/partner-lulu.png "https://upload.wikimedia.org/wikipedia/commons/a/ab/Lulu_Hypermarket_logo.png" || true
-          curl -L --fail --retry 2 -o assets/partner-reu.jpg "https://w-alaloum.edu.sa/Media/Partners%20Logo/P_Logo%202.jpg" || true
+          curl -L --fail --retry 2 -o assets/partner-reu.png "https://upload.wikimedia.org/wikipedia/commons/0/09/Riyadh-elm-university-logo.png" || true
           curl -L --fail --retry 2 -o assets/partner-diriyah.jpg "https://api.joodeskan.sa/storage/uploads/contents/images/6024c8320fbda.jpg" || true
           curl -L --fail --retry 2 -o assets/partner-shgardi.png "https://dl.memuplay.com/new_market/img/com.mnasat.nashmi.icon.2025-01-22-10-37-16.png" || true
           curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true
@@ -55,6 +55,9 @@ jobs:
 
       - name: Sync approved partners and resources
         run: python .github/scripts/profile_partners.py
+
+      - name: Apply partner asset fallbacks
+        run: python .github/scripts/partner_asset_fallbacks.py
 
       - name: Inject Google tracking
         run: python .github/scripts/inject_tracking.py
