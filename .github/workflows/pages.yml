@@ -15,7 +15,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,31 +38,31 @@ jobs:
           curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true
 
       - name: Apply site refinements
-        run: python .github/scripts/refine.py
+        run: python3 .github/scripts/refine.py
 
       - name: Apply client notes
-        run: python .github/scripts/apply_client_notes.py
+        run: python3 .github/scripts/apply_client_notes.py
 
       - name: Sync approved profile core
-        run: python .github/scripts/profile_core.py
+        run: python3 .github/scripts/profile_core.py
 
       - name: Sync approved practice areas
-        run: python .github/scripts/profile_practices.py
+        run: python3 .github/scripts/profile_practices.py
 
       - name: Sync approved partners and resources
-        run: python .github/scripts/profile_partners.py
+        run: python3 .github/scripts/profile_partners.py
 
       - name: Apply partner asset fallbacks
-        run: python .github/scripts/partner_asset_fallbacks.py
+        run: python3 .github/scripts/partner_asset_fallbacks.py
 
       - name: Compact one-page layout
-        run: python .github/scripts/compact_home.py
+        run: python3 .github/scripts/compact_home.py
 
       - name: Apply latest client notes
-        run: python .github/scripts/latest_client_notes.py
+        run: python3 .github/scripts/latest_client_notes.py
 
       - name: Inject Google tracking
-        run: python .github/scripts/inject_tracking.py
+        run: python3 .github/scripts/inject_tracking.py
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
