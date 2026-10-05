@@ -62,6 +62,9 @@ jobs:
       - name: Compact one-page layout
         run: python .github/scripts/compact_home.py
 
+      - name: Apply latest client notes
+        run: python .github/scripts/latest_client_notes.py
+
       - name: Inject Google tracking
         run: python .github/scripts/inject_tracking.py
 
