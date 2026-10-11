@@ -35,7 +35,7 @@ jobs:
           curl -L --fail --retry 2 -o assets/partner-reu.png "https://upload.wikimedia.org/wikipedia/commons/0/09/Riyadh-elm-university-logo.png" || true
           curl -L --fail --retry 2 -o assets/partner-diriyah.jpg "https://api.joodeskan.sa/storage/uploads/contents/images/6024c8320fbda.jpg" || true
           curl -L --fail --retry 2 -o assets/partner-shgardi.png "https://dl.memuplay.com/new_market/img/com.mnasat.nashmi.icon.2025-01-22-10-37-16.png" || true
-          curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true\n          curl -L --fail --retry 3 --retry-delay 2 -o assets/source-images/justice.png "https://drhalsaeed.com/wp-content/uploads/2025/01/Saudi_Ministry_of_Justice_Logo.svg_-842x1024.png"
+          curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true
 
       - name: Apply site refinements
         run: python3 .github/scripts/refine.py
