@@ -15,6 +15,27 @@ h = h.replace(
     '<span class="lang-en">Legal knowledge<br>Independent judgment<br>Commitment to your interests</span>'
 )
 
+# Restore the original compact six-partner presentation requested by the client.
+partners = '''<section class="section partner-section">
+  <div class="container">
+    <div class="section-head reveal"><div><span class="eyebrow"><span class="lang-ar">شركاء النجاح</span><span class="lang-en">Success partners</span></span><h2 class="title-lg"><span class="lang-ar">شركاء نجاح نفخر بالعمل معهم.</span><span class="lang-en">Selected organisations presented among the firm’s success partners.</span></h2></div><p><span class="lang-ar">نعتز بثقة الجهات التي تعاملت معها الشركة، ونلتزم بالحفاظ على سرية العلاقة المهنية وطبيعتها.</span><span class="lang-en">We value the trust of organisations the firm has worked with while respecting the confidentiality and nature of every professional relationship.</span></p></div>
+    <div class="partners-grid">
+      <div class="partner-logo reveal"><img src="assets/source-images/tourism.png" alt="وزارة السياحة" loading="lazy"><span><span class="lang-ar">وزارة السياحة</span><span class="lang-en">Ministry of Tourism</span></span></div>
+      <div class="partner-logo reveal"><img src="assets/source-images/commerce.png" alt="وزارة التجارة" loading="lazy"><span><span class="lang-ar">وزارة التجارة</span><span class="lang-en">Ministry of Commerce</span></span></div>
+      <div class="partner-logo reveal"><img src="assets/source-images/industry.png" alt="وزارة الصناعة والثروة المعدنية" loading="lazy"><span><span class="lang-ar">وزارة الصناعة والثروة المعدنية</span><span class="lang-en">Ministry of Industry and Mineral Resources</span></span></div>
+      <div class="partner-logo reveal"><img src="assets/source-images/sama.png" alt="البنك المركزي السعودي" loading="lazy"><span><span class="lang-ar">البنك المركزي السعودي</span><span class="lang-en">Saudi Central Bank</span></span></div>
+      <div class="partner-logo reveal"><img src="assets/source-images/aramco.png" alt="أرامكو السعودية" loading="lazy"><span><span class="lang-ar">أرامكو السعودية</span><span class="lang-en">Saudi Aramco</span></span></div>
+      <div class="partner-logo reveal"><img src="assets/source-images/justice.svg" alt="وزارة العدل" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>
+    </div>
+  </div>
+</section>'''
+h = re.sub(
+    r'<section class="section partner-section(?: profile-partners)?">[\s\S]*?</section>',
+    partners,
+    h,
+    count=1,
+)
+
 # Keep the integrated legal expertise section.
 # Remove only the consultation summary form card requested by the client.
 h = re.sub(
@@ -40,8 +61,8 @@ h = h.replace(
 )
 
 # Refresh asset query to avoid stale iPhone/Safari cache.
-h = re.sub(r'href="assets/styles\.css(?:\?[^\"]*)?"', 'href="assets/styles.css?v=20261005-contact-fix"', h)
-h = re.sub(r'src="assets/app\.js(?:\?[^\"]*)?"', 'src="assets/app.js?v=20261005-contact-fix"', h)
+h = re.sub(r'href="assets/styles\.css(?:\?[^\"]*)?"', 'href="assets/styles.css?v=20261011-six-partners"', h)
+h = re.sub(r'src="assets/app\.js(?:\?[^\"]*)?"', 'src="assets/app.js?v=20261011-six-partners"', h)
 index.write_text(h, encoding='utf-8')
 
 # Make the remaining contact content balanced after removing the form.
