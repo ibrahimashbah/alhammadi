@@ -37,6 +37,15 @@ jobs:
           curl -L --fail --retry 2 -o assets/partner-shgardi.png "https://dl.memuplay.com/new_market/img/com.mnasat.nashmi.icon.2025-01-22-10-37-16.png" || true
           curl -L --fail --retry 2 -o assets/partner-century.jpg "https://images.sehaguide.com/logos/11512/1Vzij41B_400x4001adebf21-3e5f-4eb8-9f80-e4fd5506a194.jpg" || true
 
+      - name: Save Ministry of Justice official logo locally
+        run: |
+          mkdir -p assets/source-images
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 60 \
+            "https://upload.wikimedia.org/wikipedia/ar/6/62/Saudi_Ministry_of_Justice_Logo.svg" \
+            -o assets/source-images/ministry-justice-official.svg
+          test -s assets/source-images/ministry-justice-official.svg
+          grep -qi '<svg' assets/source-images/ministry-justice-official.svg
+
       - name: Apply site refinements
         run: python3 .github/scripts/refine.py
 
