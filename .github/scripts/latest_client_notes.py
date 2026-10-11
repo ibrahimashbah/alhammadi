@@ -25,7 +25,7 @@ partners = '''<section class="section partner-section">
       <div class="partner-logo reveal"><img src="assets/source-images/industry.png" alt="وزارة الصناعة والثروة المعدنية" loading="lazy"><span><span class="lang-ar">وزارة الصناعة والثروة المعدنية</span><span class="lang-en">Ministry of Industry and Mineral Resources</span></span></div>
       <div class="partner-logo reveal"><img src="assets/source-images/sama.png" alt="البنك المركزي السعودي" loading="lazy"><span><span class="lang-ar">البنك المركزي السعودي</span><span class="lang-en">Saudi Central Bank</span></span></div>
       <div class="partner-logo reveal"><img src="assets/source-images/aramco.png" alt="أرامكو السعودية" loading="lazy"><span><span class="lang-ar">أرامكو السعودية</span><span class="lang-en">Saudi Aramco</span></span></div>
-      <div class="partner-logo reveal"><img src="assets/source-images/justice.png" alt="وزارة العدل السعودية" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>
+      <div class="partner-logo reveal"><img src="https://saudipedia.com/saudipedia/uploads/images/2023/11/12/73675.jpg" alt="وزارة العدل السعودية" loading="lazy"><span><span class="lang-ar">وزارة العدل</span><span class="lang-en">Ministry of Justice</span></span></div>
     </div>
   </div>
 </section>'''
